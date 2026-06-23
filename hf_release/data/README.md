@@ -8,9 +8,20 @@ tags:
 
 # KeepEdit Release Data
 
-本仓库存放 KeepEdit 发布版实验数据与中间结果。目录会下载到项目根目录下的 `data/`。
+本仓库存放 KeepEdit 发布版实验数据与中间结果。为避免在 Hugging Face 上平铺十几万个小文件，发布内容采用归档包形式；下载后运行解包脚本即可恢复项目根目录下的 `data/`。
 
 主要内容：
+
+```text
+archives/data_processed.tar
+archives/data_candidates.tar
+archives/data_teachers.tar
+archives/data_diffsynth.tar
+archives/data_outputs.tar
+archives/MANIFEST.sha256
+```
+
+解包后得到：
 
 ```text
 data/processed/
@@ -44,6 +55,8 @@ huggingface-cli download <DATA_REPO_ID> \
   --repo-type dataset \
   --local-dir . \
   --local-dir-use-symlinks False
+
+bash scripts/unpack_release_data_archives.sh
 ```
 
 如果不下载本仓库数据，也可以从原始 MagicBrush parquet 重新预处理：

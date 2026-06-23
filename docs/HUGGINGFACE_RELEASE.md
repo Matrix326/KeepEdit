@@ -39,7 +39,18 @@ README.md
 
 ### 1.2 数据
 
-上传 `data/`，包括：
+发布版默认不把 17 万多个数据文件直接平铺到 Hugging Face，而是上传归档包：
+
+```text
+archives/data_processed.tar
+archives/data_candidates.tar
+archives/data_teachers.tar
+archives/data_diffsynth.tar
+archives/data_outputs.tar
+archives/MANIFEST.sha256
+```
+
+解包后恢复为：
 
 ```text
 data/processed/
@@ -49,7 +60,7 @@ data/diffsynth/
 data/outputs/
 ```
 
-如果只想发布最小复现实验，可以只上传：
+如果只想重新生成最小复现实验，可以只保留：
 
 ```text
 data/processed/
@@ -82,20 +93,49 @@ export HF_TOKEN=hf_xxx
 
 ## 3. 一键上传
 
+默认创建公开仓库。当前发布版按公开模型仓库和公开数据集仓库发布，不使用 `--private`。
+脚本默认上传 `hf_release/staging/hf_dataset/archives/**`。先打包数据：
+
+```bash
+bash scripts/pack_release_data_archives.sh
+```
+
+然后上传。上传过程使用 Hugging Face 的 `upload_large_folder`，会在归档根目录生成可恢复上传缓存 `.cache/.huggingface/`。
+
 ```bash
 python scripts/upload_release_to_hf.py \
   --weights_repo_id <HF_USER_OR_ORG>/keepedit-release-weights \
   --data_repo_id <HF_USER_OR_ORG>/keepedit-release-data
 ```
 
-如果需要私有仓库：
+如果本机代理使用自签名证书，`huggingface_hub` 可能在 TLS 校验处失败。确认当前网络环境可信后，可以加：
 
 ```bash
 python scripts/upload_release_to_hf.py \
   --weights_repo_id <HF_USER_OR_ORG>/keepedit-release-weights \
   --data_repo_id <HF_USER_OR_ORG>/keepedit-release-data \
-  --private
+  --disable_ssl_verification
 ```
+
+如果只上传权重：
+
+```bash
+python scripts/upload_release_to_hf.py \
+  --weights_repo_id <HF_USER_OR_ORG>/keepedit-release-weights \
+  --data_repo_id <HF_USER_OR_ORG>/keepedit-release-data \
+  --skip_data
+```
+
+如果只上传数据：
+
+```bash
+python scripts/upload_release_to_hf.py \
+  --weights_repo_id <HF_USER_OR_ORG>/keepedit-release-weights \
+  --data_repo_id <HF_USER_OR_ORG>/keepedit-release-data \
+  --skip_weights
+```
+
+如果确实要上传原始 `data/**` 小文件树，而不是归档包，额外加 `--upload_raw_data`；不建议常规发布这样做。
 
 如果希望连 `reports/` 也上传到 dataset repo：
 
@@ -124,6 +164,8 @@ huggingface-cli download <HF_USER_OR_ORG>/keepedit-release-data \
   --repo-type dataset \
   --local-dir . \
   --local-dir-use-symlinks False
+
+bash scripts/unpack_release_data_archives.sh
 ```
 
 下载外部依赖和基座模型：

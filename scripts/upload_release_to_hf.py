@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import argparse
+from json import JSONDecodeError
 from pathlib import Path
 
-from huggingface_hub import HfApi
+import httpx
+from huggingface_hub import HfApi, set_client_factory
 
 
 FINAL_LORA_DIRS = [
@@ -19,10 +21,31 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--weights_repo_id", required=True, help="HF model repo, e.g. username/keepedit-release-weights.")
     parser.add_argument("--data_repo_id", required=True, help="HF dataset repo, e.g. username/keepedit-release-data.")
     parser.add_argument("--data_dir", default="data", help="Local data directory to upload to the dataset repo.")
+    parser.add_argument(
+        "--data_archive_root",
+        default="hf_release/staging/hf_dataset",
+        help="Directory whose archives/ subfolder contains packed release data.",
+    )
     parser.add_argument("--private", action="store_true", help="Create private repos.")
     parser.add_argument("--revision", default="main")
     parser.add_argument("--include_reports", action="store_true", help="Also upload release metrics and visual galleries.")
     parser.add_argument("--token", help="HF token. If omitted, huggingface_hub uses the logged-in token.")
+    parser.add_argument("--skip_repo_create", action="store_true", help="Assume target repos already exist.")
+    parser.add_argument("--skip_readmes", action="store_true", help="Do not upload model/dataset cards.")
+    parser.add_argument("--skip_weights", action="store_true", help="Do not upload LoRA weights.")
+    parser.add_argument("--skip_data", action="store_true", help="Do not upload the data directory.")
+    parser.add_argument("--upload_raw_data", action="store_true", help="Upload raw data/** instead of archives/**.")
+    parser.add_argument(
+        "--regular_data_upload",
+        action="store_true",
+        help="Use upload_folder for data instead of the resumable upload_large_folder path.",
+    )
+    parser.add_argument("--num_workers", type=int, default=8, help="Workers for large data upload.")
+    parser.add_argument(
+        "--disable_ssl_verification",
+        action="store_true",
+        help="Disable TLS certificate verification for self-signed local proxy environments.",
+    )
     return parser.parse_args()
 
 
@@ -47,16 +70,59 @@ def upload_lora_weights(api: HfApi, repo_id: str, revision: str) -> None:
         )
 
 
-def upload_release_data(api: HfApi, repo_id: str, data_dir: Path, revision: str, include_reports: bool) -> None:
+def upload_release_data(
+    api: HfApi,
+    repo_id: str,
+    data_dir: Path,
+    data_archive_root: Path,
+    revision: str,
+    include_reports: bool,
+    upload_raw_data: bool,
+    regular_data_upload: bool,
+    num_workers: int,
+) -> None:
+    if not upload_raw_data:
+        require_path(data_archive_root / "archives")
+        api.upload_large_folder(
+            repo_id=repo_id,
+            repo_type="dataset",
+            folder_path=str(data_archive_root),
+            revision=revision,
+            private=False,
+            allow_patterns="archives/**",
+            num_workers=num_workers,
+        )
+        if include_reports and Path("reports").exists():
+            api.upload_folder(
+                repo_id=repo_id,
+                repo_type="dataset",
+                folder_path="reports",
+                path_in_repo="reports",
+                revision=revision,
+                commit_message="Upload KeepEdit release reports",
+            )
+        return
+
     require_path(data_dir)
-    api.upload_folder(
-        repo_id=repo_id,
-        repo_type="dataset",
-        folder_path=str(data_dir),
-        path_in_repo="data",
-        revision=revision,
-        commit_message="Upload KeepEdit release data",
-    )
+    if regular_data_upload:
+        api.upload_folder(
+            repo_id=repo_id,
+            repo_type="dataset",
+            folder_path=str(data_dir),
+            path_in_repo="data",
+            revision=revision,
+            commit_message="Upload KeepEdit release data",
+        )
+    else:
+        api.upload_large_folder(
+            repo_id=repo_id,
+            repo_type="dataset",
+            folder_path=".",
+            revision=revision,
+            private=False,
+            allow_patterns=f"{data_dir.name}/**",
+            num_workers=num_workers,
+        )
     if include_reports and Path("reports").exists():
         api.upload_folder(
             repo_id=repo_id,
@@ -91,17 +157,44 @@ def upload_readmes(api: HfApi, weights_repo_id: str, data_repo_id: str, revision
         )
 
 
+def create_release_repo(api: HfApi, repo_id: str, repo_type: str, private: bool) -> None:
+    visibility = "private" if private else "public"
+    try:
+        api.create_repo(repo_id, repo_type=repo_type, visibility=visibility, exist_ok=True)
+    except JSONDecodeError:
+        api.repo_info(repo_id, repo_type=repo_type)
+        print(f"Repository already available: {repo_id} ({repo_type})")
+
+
 def main() -> None:
     args = parse_args()
+    if args.disable_ssl_verification:
+        set_client_factory(lambda: httpx.Client(verify=False, timeout=None))
     api = HfApi(token=args.token)
-    api.create_repo(args.weights_repo_id, repo_type="model", private=args.private, exist_ok=True)
-    api.create_repo(args.data_repo_id, repo_type="dataset", private=args.private, exist_ok=True)
-    upload_readmes(api, args.weights_repo_id, args.data_repo_id, args.revision)
-    upload_lora_weights(api, args.weights_repo_id, args.revision)
-    upload_release_data(api, args.data_repo_id, Path(args.data_dir), args.revision, args.include_reports)
+    if not args.skip_repo_create:
+        create_release_repo(api, args.weights_repo_id, repo_type="model", private=args.private)
+        create_release_repo(api, args.data_repo_id, repo_type="dataset", private=args.private)
+    if not args.skip_readmes:
+        upload_readmes(api, args.weights_repo_id, args.data_repo_id, args.revision)
+    if not args.skip_weights:
+        upload_lora_weights(api, args.weights_repo_id, args.revision)
+    if not args.skip_data:
+        upload_release_data(
+            api,
+            args.data_repo_id,
+            Path(args.data_dir),
+            Path(args.data_archive_root),
+            args.revision,
+            args.include_reports,
+            args.upload_raw_data,
+            args.regular_data_upload,
+            args.num_workers,
+        )
     print("Uploaded KeepEdit release artifacts:")
-    print(f"  weights: https://huggingface.co/{args.weights_repo_id}")
-    print(f"  data:    https://huggingface.co/datasets/{args.data_repo_id}")
+    if not args.skip_weights:
+        print(f"  weights: https://huggingface.co/{args.weights_repo_id}")
+    if not args.skip_data:
+        print(f"  data:    https://huggingface.co/datasets/{args.data_repo_id}")
 
 
 if __name__ == "__main__":

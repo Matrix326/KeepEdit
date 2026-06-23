@@ -7,6 +7,7 @@ __pycache__/
 .DS_Store
 .codex/
 .agents/
+/.cache/
 
 /data/
 /checkpoints/

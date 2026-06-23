@@ -89,9 +89,22 @@ huggingface-cli download <HF_USER_OR_ORG>/keepedit-release-data \
   --repo-type dataset \
   --local-dir . \
   --local-dir-use-symlinks False
+
+bash scripts/unpack_release_data_archives.sh
 ```
 
-下载后应包含：
+数据集仓库发布为少量归档文件，下载后先得到：
+
+```text
+archives/data_processed.tar
+archives/data_candidates.tar
+archives/data_teachers.tar
+archives/data_diffsynth.tar
+archives/data_outputs.tar
+archives/MANIFEST.sha256
+```
+
+解包后应包含：
 
 ```text
 data/processed/
