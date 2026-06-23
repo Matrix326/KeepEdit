@@ -1,0 +1,35 @@
+extends: ./keepedit_stage1_moe.yaml
+
+project:
+  name: keepedit_release_qwen_edit_lora
+
+qwen_edit_lora:
+  diffsynth_root: external/DiffSynth-Studio
+  model_base: checkpoints/diffsynth
+  edit_model_id: Qwen/Qwen-Image-Edit-2511
+  text_vae_model_id: Qwen/Qwen-Image
+  gt_output_dir: checkpoints/qwen_edit_2511_keepedit_gt_onestage
+  mtp_output_dir: checkpoints/qwen_edit_2511_mtp_phasea
+  moe_output_dir: checkpoints/qwen_edit_2511_moe_teacher_onestage
+  gt_dataset_dir: data/diffsynth/magicbrush_train_qwen2511_gt_onestage
+  mtp_dataset_dir: data/diffsynth/magicbrush_train_mtp_phasea
+  moe_dataset_dir: data/diffsynth/magicbrush_train_qwen2511_moe_teacher_onestage
+  distillation_mode: release_source_only_qwen2511_lora
+  infer_condition_mode: input_only
+  no_background_compose: true
+  max_pixels: 262144
+  dataset_repeat: 1
+  gt_epochs: 2
+  mtp_epochs: 1
+  moe_epochs: 1
+  learning_rate: 0.00005
+  lora_rank: 32
+  gradient_accumulation_steps: 1
+  dataset_num_workers: 8
+  num_inference_steps: 40
+  cfg_scale: 4.0
+  denoising_strength: 0.9
+  seed: 42
+  mask_edit_weight: 1.5
+  mask_bg_weight: 0.5
+  teacher_source: moe_fusion_teacher

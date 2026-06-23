@@ -1,0 +1,156 @@
+extends: ../project.yaml
+
+project:
+  name: keepedit_stage1_moe
+
+runtime:
+  device: cuda
+  dtype: float16
+
+experts:
+  pix2pix:
+    enabled: true
+    type: instruct_pix2pix
+    model_id: checkpoints/hf/timbrooks__instruct-pix2pix
+    device: cuda
+    dtype: float16
+    variant: fp16
+    num_inference_steps: 30
+    guidance_scale: 10.0
+    image_guidance_scale: 1.05
+    generator_seed: 42
+    unload_after_generate: true
+  qwen_image_edit:
+    enabled: true
+    type: qwen_image_edit
+    model_id: checkpoints/hf/Qwen__Qwen-Image-Edit
+    device: cuda
+    device_map: cuda
+    dtype: bfloat16
+    num_inference_steps: 30
+    true_cfg_scale: 4.0
+    negative_prompt: " "
+    prompt_suffix: "Preserve regions not mentioned in the instruction."
+    generator_seed: 42
+  qwen_image_edit_conservative:
+    enabled: false
+    type: qwen_image_edit
+    model_id: checkpoints/hf/Qwen__Qwen-Image-Edit
+    device: cuda
+    device_map: cuda
+    dtype: bfloat16
+    num_inference_steps: 30
+    true_cfg_scale: 2.8
+    negative_prompt: " "
+    prompt_suffix: "Make the requested edit conservatively. Preserve every unrelated region."
+    generator_seed: 17
+  qwen_image_edit_aggressive:
+    enabled: false
+    type: qwen_image_edit
+    model_id: checkpoints/hf/Qwen__Qwen-Image-Edit
+    device: cuda
+    device_map: cuda
+    dtype: bfloat16
+    num_inference_steps: 36
+    true_cfg_scale: 5.5
+    negative_prompt: " "
+    prompt_suffix: "Make the requested edit clearly and visibly while keeping unrelated content stable."
+    generator_seed: 123
+  editar:
+    enabled: true
+    type: editar
+    repo_dir: external/EditAR
+    gpt_ckpt: external/EditAR/checkpoints/editar/editar_release.pt
+    vq_ckpt: external/EditAR/pretrained_models/vq_ds16_t2i.pt
+    t5_path: external/EditAR/pretrained_models/t5-ckpt
+    t5_model_type: flan-t5-xl
+    cfg_scale: 3.0
+    seed: 83
+    image_size: 512
+    mixed_precision: bf16
+    optional: true
+  identity:
+    enabled: false
+
+composer:
+  hard_copy_background: true
+  use_raw_for_global: true
+  dilate_radius: 8
+  feather_radius: 12
+
+mask:
+  diff_threshold: 0.06
+  min_area_ratio: 0.002
+  diff_weight: 1.0
+  candidate_variance_weight: 0.55
+  qwen_change_weight: 0.35
+  close_radius: 5
+  dilate_radius: 3
+  # Optional semantic segmentation command hook for mask-free real benchmark
+  # images. The command should write KEEPEDIT_OUT_MASK.
+  semantic_command:
+  semantic_timeout_seconds: 600
+
+stage1_moe_fusion:
+  enabled: true
+  algorithm: keepedit_release_region_preference_calibrated_moe
+  dilate_radius: 8
+  feather_radius: 12
+  component_min_area_ratio: 0.001
+  edit_weight: 1.0
+  background_weight: 0.35
+  semantic_weight: 0.25
+  boundary_weight: 0.2
+  color_harmonize_strength: 0.25
+  global_mask_ratio: 0.65
+  source_background_for_local: true
+  qwen_prior_bonus: 0.015
+  temperature: 0.05
+  soft_top_k: 2
+  hard_route_confidence: 0.82
+  pyramid_levels: 5
+  poisson_blend: false
+  poisson_mode: mixed
+  low_confidence_target_mix: 0.0
+  low_confidence_threshold: 0.62
+  preference_margin: 0.01
+  fusion_fallback_epsilon: 0.005
+  fusion_fallback: best_expert
+  min_edit_change_ratio: 0.30
+  min_target_edit_change: 0.05
+  low_edit_fallback: canonical_target
+  virtual_qwen_family: true
+  qwen_conservative_strength: 0.65
+  qwen_aggressive_strength: 1.25
+  rank_calibrator:
+    enabled: true
+    # Lower calibrated score is better. These small priors are intentionally
+    # conservative; target/mask metrics remain dominant.
+    expert_bias:
+      qwen_image_edit*: -0.004
+      pix2pix: 0.001
+      editar: 0.001
+    edit_mse_weight: 0.0
+    bg_mse_weight: 0.03
+    direction_weight: 0.02
+    boundary_weight: 0.05
+  local_refiner:
+    enabled: true
+    # Fast default for full training. For optional local generative refinement,
+    # switch provider to diffusers_inpaint or one of brushnet_command,
+    # lama_command, powerpaint_command and set command/model_id below.
+    provider: opencv_lama_fallback
+    model_id:
+    command:
+    device: cuda
+    torch_dtype: float16
+    num_inference_steps: 20
+    guidance_scale: 4.0
+    strength: 0.45
+    mask_dilate_radius: 8
+    boundary_radius: 10
+    refine_full_edit_region: false
+    max_pixels: 589824
+    hard_clamp_background: true
+    timeout_seconds: 600
+    save_debug: false

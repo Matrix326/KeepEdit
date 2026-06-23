@@ -1,0 +1,57 @@
+project:
+  name: keepedit
+  seed: 42
+  work_dir: .
+  data_dir: data
+  checkpoint_dir: checkpoints
+  report_dir: reports
+
+runtime:
+  device: cuda
+  dtype: float16
+  allow_tf32: true
+
+planner:
+  type: rule
+
+mask:
+  source_priority:
+    - dataset_mask
+    - target_difference
+    - full_image
+  diff_threshold: 0.06
+  dilate_radius: 8
+  feather_radius: 12
+
+experts:
+  pix2pix:
+    enabled: false
+    type: instruct_pix2pix
+    model_id: timbrooks/instruct-pix2pix
+    device: cuda
+    dtype: float16
+    variant: fp16
+    num_inference_steps: 30
+    guidance_scale: 7.5
+    image_guidance_scale: 1.5
+  qwen_image_edit:
+    enabled: false
+    type: qwen_image_edit
+    model_id: Qwen/Qwen-Image-Edit
+    device_map: cuda
+    dtype: bfloat16
+    num_inference_steps: 50
+    true_cfg_scale: 4.0
+  editar:
+    enabled: false
+    type: editar
+    repo_dir: external/EditAR
+  identity:
+    enabled: true
+    type: identity
+
+composer:
+  checkpoint: null
+  hard_copy_background: true
+  dilate_radius: 8
+  feather_radius: 12

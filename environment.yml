@@ -1,0 +1,20 @@
+name: keepedit
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - numpy
+  - pillow
+  - scikit-image
+  - pandas
+  - pyyaml
+  - tqdm
+  - pytorch
+  - torchvision
+  - pytorch-cuda=12.1
+  - pip:
+      - -e ".[all]"
+      - peft>=0.13

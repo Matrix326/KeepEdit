@@ -1,0 +1,184 @@
+# Hugging Face 发布说明
+
+本项目代码仓库不提交 `checkpoints/`、`data/`、`external/`。这些大文件通过 Hugging Face 分发。
+
+推荐拆成两个仓库：
+
+```text
+模型权重 repo:  <HF_USER_OR_ORG>/keepedit-release-weights
+数据集 repo:    <HF_USER_OR_ORG>/keepedit-release-data
+```
+
+其中：
+
+```text
+weights repo 类型: model
+data repo 类型:    dataset
+```
+
+## 1. 发布内容
+
+### 1.1 权重
+
+只上传最终 LoRA，不上传中间 step，不上传 Qwen 基座模型：
+
+```text
+checkpoints/qwen_edit_2511_keepedit_gt_onestage/step-4404.safetensors
+checkpoints/qwen_edit_2511_mtp_phasea/step-2269.safetensors
+checkpoints/qwen_edit_2511_moe_teacher_onestage/step-2202.safetensors
+```
+
+上传后 repo 内结构为：
+
+```text
+qwen_edit_2511_keepedit_gt_onestage/step-4404.safetensors
+qwen_edit_2511_mtp_phasea/step-2269.safetensors
+qwen_edit_2511_moe_teacher_onestage/step-2202.safetensors
+README.md
+```
+
+### 1.2 数据
+
+上传 `data/`，包括：
+
+```text
+data/processed/
+data/candidates/
+data/teachers/
+data/diffsynth/
+data/outputs/
+```
+
+如果只想发布最小复现实验，可以只上传：
+
+```text
+data/processed/
+data/teachers/
+data/diffsynth/magicbrush_train_mtp_phasea/
+data/outputs/
+```
+
+但完整 MoE 复现需要 `data/candidates/`。
+
+## 2. 登录 Hugging Face
+
+安装依赖：
+
+```bash
+pip install -U huggingface_hub
+```
+
+登录：
+
+```bash
+huggingface-cli login
+```
+
+或者使用环境变量：
+
+```bash
+export HF_TOKEN=hf_xxx
+```
+
+## 3. 一键上传
+
+```bash
+python scripts/upload_release_to_hf.py \
+  --weights_repo_id <HF_USER_OR_ORG>/keepedit-release-weights \
+  --data_repo_id <HF_USER_OR_ORG>/keepedit-release-data
+```
+
+如果需要私有仓库：
+
+```bash
+python scripts/upload_release_to_hf.py \
+  --weights_repo_id <HF_USER_OR_ORG>/keepedit-release-weights \
+  --data_repo_id <HF_USER_OR_ORG>/keepedit-release-data \
+  --private
+```
+
+如果希望连 `reports/` 也上传到 dataset repo：
+
+```bash
+python scripts/upload_release_to_hf.py \
+  --weights_repo_id <HF_USER_OR_ORG>/keepedit-release-weights \
+  --data_repo_id <HF_USER_OR_ORG>/keepedit-release-data \
+  --include_reports
+```
+
+## 4. 下载方式
+
+下载权重到项目的 `checkpoints/`：
+
+```bash
+huggingface-cli download <HF_USER_OR_ORG>/keepedit-release-weights \
+  --repo-type model \
+  --local-dir checkpoints \
+  --local-dir-use-symlinks False
+```
+
+下载数据到项目根目录：
+
+```bash
+huggingface-cli download <HF_USER_OR_ORG>/keepedit-release-data \
+  --repo-type dataset \
+  --local-dir . \
+  --local-dir-use-symlinks False
+```
+
+下载外部依赖和基座模型：
+
+```bash
+bash scripts/download_required_assets.sh
+python scripts/check_required_assets.py
+```
+
+## 5. 为什么代码仓库不包含大文件
+
+`.gitignore` 已经排除：
+
+```text
+data/
+checkpoints/
+external/
+reports/*.csv
+reports/*.json
+reports/*.jsonl
+reports/visual_gallery*/
+```
+
+代码仓库只保留：
+
+```text
+src/
+scripts/
+configs/
+docs/
+README.md
+environment.yml
+pyproject.toml
+Makefile
+```
+
+这样 Git 仓库保持轻量，所有大文件通过 Hugging Face 下载。
+
+## 6. 发布前检查
+
+```bash
+python - <<'PY'
+from pathlib import Path
+required = [
+  "checkpoints/qwen_edit_2511_keepedit_gt_onestage/step-4404.safetensors",
+  "checkpoints/qwen_edit_2511_mtp_phasea/step-2269.safetensors",
+  "checkpoints/qwen_edit_2511_moe_teacher_onestage/step-2202.safetensors",
+  "data/processed/magicbrush_train/train.jsonl",
+  "data/processed/magicbrush_dev/dev.jsonl",
+  "data/teachers/magicbrush_train_moe_fusion/predictions.jsonl",
+  "data/teachers/magicbrush_dev_moe_fusion/predictions.jsonl",
+]
+missing = [p for p in required if not Path(p).exists()]
+if missing:
+    raise SystemExit("Missing:\\n" + "\\n".join(missing))
+print("release assets are ready")
+PY
+```
