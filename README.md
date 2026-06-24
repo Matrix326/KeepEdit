@@ -89,16 +89,17 @@ huggingface-cli download <HF_USER_OR_ORG>/keepedit-release-data \
 bash scripts/unpack_release_data_archives.sh
 ```
 
-数据集仓库发布为少量归档文件，下载后先得到：
+数据集仓库发布为少量归档分卷，下载后先得到：
 
 ```text
-archives/data_processed.tar
-archives/data_candidates.tar
-archives/data_teachers.tar
-archives/data_diffsynth.tar
-archives/data_outputs.tar
+archives/data_processed.tar.000.part
+archives/data_candidates.tar.000.part
+archives/data_teachers.tar.000.part
+...
 archives/MANIFEST.sha256
 ```
+
+`scripts/unpack_release_data_archives.sh` 会自动识别完整 `data_*.tar` 或分卷 `data_*.tar.*.part`。
 
 解包后应包含：
 

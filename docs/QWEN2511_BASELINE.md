@@ -16,15 +16,6 @@
 编辑图 O = Qwen-Image-Edit-2511(I, p)
 ```
 
-不使用：
-
-```text
-target image
-mask
-expert candidate
-MoE teacher
-LoRA checkpoint
-```
 
 这个实验用于回答：不做任何任务微调时，Qwen-Image-Edit-2511 在 MagicBrush-dev 上的基础能力如何。
 

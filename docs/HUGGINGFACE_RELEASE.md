@@ -39,14 +39,13 @@ README.md
 
 ### 1.2 数据
 
-发布版默认不把 17 万多个数据文件直接平铺到 Hugging Face，而是上传归档包：
+发布版默认不把 17 万多个数据文件直接平铺到 Hugging Face，而是上传归档包。为避免单个文件超过 20GB，实际发布使用 5GB 左右的分卷：
 
 ```text
-archives/data_processed.tar
-archives/data_candidates.tar
-archives/data_teachers.tar
-archives/data_diffsynth.tar
-archives/data_outputs.tar
+archives/data_processed.tar.000.part
+archives/data_candidates.tar.000.part
+archives/data_teachers.tar.000.part
+...
 archives/MANIFEST.sha256
 ```
 
@@ -94,13 +93,21 @@ export HF_TOKEN=hf_xxx
 ## 3. 一键上传
 
 默认创建公开仓库。当前发布版按公开模型仓库和公开数据集仓库发布，不使用 `--private`。
-脚本默认上传 `hf_release/staging/hf_dataset/archives/**`。先打包数据：
+先打包数据：
 
 ```bash
 bash scripts/pack_release_data_archives.sh
 ```
 
-然后上传。上传过程使用 Hugging Face 的 `upload_large_folder`，会在归档根目录生成可恢复上传缓存 `.cache/.huggingface/`。
+再切成 Hugging Face 更稳的 5GB 分卷：
+
+```bash
+bash scripts/split_release_data_archives.sh
+```
+
+默认 Python 上传脚本会上传 `hf_release/staging/hf_dataset/archives/**` 中的完整 tar；如果使用分卷发布，推荐用 Hugging Face CLI 逐个上传 `hf_release/staging/hf_dataset_split/archives/*` 到 repo 的 `archives/` 目录，失败时可以从单个分卷继续。
+
+完整 tar 上传命令如下。上传过程使用 Hugging Face 的 `upload_large_folder`，会在归档根目录生成可恢复上传缓存 `.cache/.huggingface/`。
 
 ```bash
 python scripts/upload_release_to_hf.py \

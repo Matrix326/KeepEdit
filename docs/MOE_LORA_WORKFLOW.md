@@ -4,7 +4,7 @@
 
 ## 1. 总体思想
 
-MoE-Fusion Teacher 是训练期 teacher，不是最终部署模型。
+MoE-Fusion Teacher 是训练期 teacher。
 
 训练期允许使用：
 
@@ -27,8 +27,6 @@ T_moe = MoE_Fusion(I, p, G, M, candidates)
 ```text
 I, p -> T_moe
 ```
-
-推理时只加载该 LoRA，不再运行三个专家，也不输入 teacher、target 或 mask。
 
 ## 2. 专家候选
 

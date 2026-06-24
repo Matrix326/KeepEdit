@@ -76,7 +76,7 @@ data/diffsynth/magicbrush_train_qwen2511_gt_onestage/summary.json
 }
 ```
 
-注意：`image` 是监督目标，`edit_image` 才是模型输入。最终推理不会输入 target。
+注意：`image` 是监督目标，`edit_image` 才是模型输入。
 
 ## 4. 训练 loss
 

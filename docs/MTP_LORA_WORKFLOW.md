@@ -1,6 +1,6 @@
 # MTP LoRA 流程说明
 
-本文档说明 `qwen2511_mtp_phasea` 的算法、数据处理、训练命令和产物位置。MTP 是 Masked Target Programming，只保留 PhaseA，不再使用 GT-anchor PhaseB。
+本文档说明 `qwen2511_mtp` 的算法、数据处理、训练命令和产物位置。MTP 是 Masked Target Programming。
 
 ## 1. 方法动机
 
@@ -26,7 +26,7 @@ G_bar = M_soft * G + (1 - M_soft) * I
 边界区域：soft mask 平滑过渡
 ```
 
-最终模型仍然只输入 source image 和 instruction，不输入 mask。
+最终模型仍然只输入 source image 和 instruction。
 
 ## 2. Mask 选择
 
