@@ -63,11 +63,12 @@ bash scripts/unpack_release_data_archives.sh
 如果不下载本仓库数据，也可以从原始 MagicBrush parquet 重新预处理：
 
 ```bash
-python scripts/download_hf_dataset_files.py \
-  --repo_id osunlp/MagicBrush \
-  --out_dir data/raw/MagicBrush \
-  --pattern "data/train-*.parquet" \
-  --pattern "data/dev-*.parquet"
+huggingface-cli download osunlp/MagicBrush \
+  --repo-type dataset \
+  --include "data/train-*.parquet" \
+  --include "data/dev-*.parquet" \
+  --local-dir data/raw/MagicBrush \
+  --local-dir-use-symlinks False
 
 python scripts/validate_magicbrush_parquet.py \
   --root data/raw/MagicBrush/data \

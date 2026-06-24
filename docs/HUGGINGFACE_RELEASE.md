@@ -90,9 +90,37 @@ huggingface-cli login
 export HF_TOKEN=hf_xxx
 ```
 
-## 3. 一键上传
+## 3. 上传流程
 
 默认创建公开仓库。当前发布版按公开模型仓库和公开数据集仓库发布，不使用 `--private`。
+
+### 3.1 上传权重
+
+只上传最终 LoRA 权重。基座模型不进入本项目发布仓库。
+
+```bash
+hf upload <HF_USER_OR_ORG>/keepedit-release-weights \
+  checkpoints/qwen_edit_2511_keepedit_gt_onestage/step-4404.safetensors \
+  qwen_edit_2511_keepedit_gt_onestage/step-4404.safetensors \
+  --repo-type model
+
+hf upload <HF_USER_OR_ORG>/keepedit-release-weights \
+  checkpoints/qwen_edit_2511_mtp_phasea/step-2269.safetensors \
+  qwen_edit_2511_mtp_phasea/step-2269.safetensors \
+  --repo-type model
+
+hf upload <HF_USER_OR_ORG>/keepedit-release-weights \
+  checkpoints/qwen_edit_2511_moe_teacher_onestage/step-2202.safetensors \
+  qwen_edit_2511_moe_teacher_onestage/step-2202.safetensors \
+  --repo-type model
+
+hf upload <HF_USER_OR_ORG>/keepedit-release-weights \
+  hf_release/weights/README.md README.md \
+  --repo-type model
+```
+
+### 3.2 打包数据
+
 先打包数据：
 
 ```bash
@@ -105,52 +133,31 @@ bash scripts/pack_release_data_archives.sh
 bash scripts/split_release_data_archives.sh
 ```
 
-默认 Python 上传脚本会上传 `hf_release/staging/hf_dataset/archives/**` 中的完整 tar；如果使用分卷发布，推荐用 Hugging Face CLI 逐个上传 `hf_release/staging/hf_dataset_split/archives/*` 到 repo 的 `archives/` 目录，失败时可以从单个分卷继续。
+### 3.3 上传数据分卷
 
-完整 tar 上传命令如下。上传过程使用 Hugging Face 的 `upload_large_folder`，会在归档根目录生成可恢复上传缓存 `.cache/.huggingface/`。
+发布版使用分卷上传。脚本会：
 
-```bash
-python scripts/upload_release_to_hf.py \
-  --weights_repo_id <HF_USER_OR_ORG>/keepedit-release-weights \
-  --data_repo_id <HF_USER_OR_ORG>/keepedit-release-data
+```text
+1. 检查远端是否已经存在该分卷，存在则跳过；
+2. 单分卷上传失败时自动重试；
+3. 单分卷上传长时间无响应时按超时中断并重试；
+4. 上传全部 data_*.tar.*.part 和 MANIFEST.sha256。
 ```
 
-如果本机代理使用自签名证书，`huggingface_hub` 可能在 TLS 校验处失败。确认当前网络环境可信后，可以加：
+推荐命令：
 
 ```bash
-python scripts/upload_release_to_hf.py \
-  --weights_repo_id <HF_USER_OR_ORG>/keepedit-release-weights \
-  --data_repo_id <HF_USER_OR_ORG>/keepedit-release-data \
-  --disable_ssl_verification
+REPO_ID=<HF_USER_OR_ORG>/keepedit-release-data \
+bash scripts/upload_split_release_archives.sh
 ```
 
-如果只上传权重：
+如果网络慢或单文件经常卡住，可以调大超时：
 
 ```bash
-python scripts/upload_release_to_hf.py \
-  --weights_repo_id <HF_USER_OR_ORG>/keepedit-release-weights \
-  --data_repo_id <HF_USER_OR_ORG>/keepedit-release-data \
-  --skip_data
-```
-
-如果只上传数据：
-
-```bash
-python scripts/upload_release_to_hf.py \
-  --weights_repo_id <HF_USER_OR_ORG>/keepedit-release-weights \
-  --data_repo_id <HF_USER_OR_ORG>/keepedit-release-data \
-  --skip_weights
-```
-
-如果确实要上传原始 `data/**` 小文件树，而不是归档包，额外加 `--upload_raw_data`；不建议常规发布这样做。
-
-如果希望连 `reports/` 也上传到 dataset repo：
-
-```bash
-python scripts/upload_release_to_hf.py \
-  --weights_repo_id <HF_USER_OR_ORG>/keepedit-release-weights \
-  --data_repo_id <HF_USER_OR_ORG>/keepedit-release-data \
-  --include_reports
+REPO_ID=<HF_USER_OR_ORG>/keepedit-release-data \
+UPLOAD_TIMEOUT_SECONDS=3600 \
+MAX_RETRIES=5 \
+bash scripts/upload_split_release_archives.sh
 ```
 
 ## 4. 下载方式

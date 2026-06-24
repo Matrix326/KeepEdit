@@ -134,11 +134,12 @@ EditAR 相关权重
 如果不使用发布数据，可以从 MagicBrush parquet 重新生成 `data/processed`：
 
 ```bash
-python scripts/download_hf_dataset_files.py \
-  --repo_id osunlp/MagicBrush \
-  --out_dir data/raw/MagicBrush \
-  --pattern "data/train-*.parquet" \
-  --pattern "data/dev-*.parquet"
+huggingface-cli download osunlp/MagicBrush \
+  --repo-type dataset \
+  --include "data/train-*.parquet" \
+  --include "data/dev-*.parquet" \
+  --local-dir data/raw/MagicBrush \
+  --local-dir-use-symlinks False
 
 python scripts/validate_magicbrush_parquet.py \
   --root data/raw/MagicBrush/data \
@@ -359,9 +360,11 @@ MoE Teacher LoRA 是当前客观指标最好的可部署模型；MTP LoRA 是更
 ## 11. 上传到 Hugging Face
 
 ```bash
-python scripts/upload_release_to_hf.py \
-  --weights_repo_id <HF_USER_OR_ORG>/keepedit-release-weights \
-  --data_repo_id <HF_USER_OR_ORG>/keepedit-release-data
+bash scripts/pack_release_data_archives.sh
+bash scripts/split_release_data_archives.sh
+
+REPO_ID=<HF_USER_OR_ORG>/keepedit-release-data \
+bash scripts/upload_split_release_archives.sh
 ```
 
 说明见：
