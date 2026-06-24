@@ -61,10 +61,35 @@ external/EditAR/
 
 ## 3. 下载权重和数据
 
+### 3.0 公开资源地址
+
+KeepEdit 发布资源：
+
+```text
+代码仓库:      https://github.com/Yitaallen/KeepEdit
+发布权重:      https://huggingface.co/Yitaallen/keepedit-release-weights
+发布数据:      https://huggingface.co/datasets/Yitaallen/keepedit-release-data
+```
+
+上游数据、模型与外部项目：
+
+```text
+MagicBrush 数据集:              https://huggingface.co/datasets/osunlp/MagicBrush
+Qwen-Image-Edit-2511:           https://huggingface.co/Qwen/Qwen-Image-Edit-2511
+Qwen-Image:                     https://huggingface.co/Qwen/Qwen-Image
+Qwen-Image-Edit:                https://huggingface.co/Qwen/Qwen-Image-Edit
+InstructPix2Pix:                https://huggingface.co/timbrooks/instruct-pix2pix
+Qwen3-VL-8B-Instruct:           https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct
+EditAR release checkpoint:      https://huggingface.co/datasets/JitengMu/CVPR2025_EditAR_release
+LlamaGen T2I / VQ tokenizer:    https://huggingface.co/peizesun/llamagen_t2i
+flan-t5-xl:                     https://huggingface.co/google/flan-t5-xl
+DiffSynth-Studio:               https://github.com/modelscope/DiffSynth-Studio
+```
+
 ### 3.1 下载 KeepEdit 发布权重
 
 ```bash
-huggingface-cli download <HF_USER_OR_ORG>/keepedit-release-weights \
+huggingface-cli download Yitaallen/keepedit-release-weights \
   --repo-type model \
   --local-dir checkpoints \
   --local-dir-use-symlinks False
@@ -81,7 +106,7 @@ checkpoints/qwen_edit_2511_moe_teacher_onestage/step-2202.safetensors
 ### 3.2 下载 KeepEdit 发布数据
 
 ```bash
-huggingface-cli download <HF_USER_OR_ORG>/keepedit-release-data \
+huggingface-cli download Yitaallen/keepedit-release-data \
   --repo-type dataset \
   --local-dir . \
   --local-dir-use-symlinks False
@@ -363,7 +388,7 @@ MoE Teacher LoRA 是当前客观指标最好的可部署模型；MTP LoRA 是更
 bash scripts/pack_release_data_archives.sh
 bash scripts/split_release_data_archives.sh
 
-REPO_ID=<HF_USER_OR_ORG>/keepedit-release-data \
+REPO_ID=Yitaallen/keepedit-release-data \
 bash scripts/upload_split_release_archives.sh
 ```
 
