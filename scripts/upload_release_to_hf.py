@@ -7,6 +7,7 @@ from pathlib import Path
 
 import httpx
 from huggingface_hub import HfApi, set_client_factory
+from huggingface_hub.hf_api import RepoUrl
 
 
 FINAL_LORA_DIRS = [
@@ -166,11 +167,38 @@ def create_release_repo(api: HfApi, repo_id: str, repo_type: str, private: bool)
         print(f"Repository already available: {repo_id} ({repo_type})")
 
 
+def repo_url_for_existing_repo(api: HfApi, repo_id: str, repo_type: str | None) -> RepoUrl:
+    endpoint = api.endpoint.rstrip("/")
+    if repo_type == "dataset":
+        return RepoUrl(f"{endpoint}/datasets/{repo_id}", endpoint=endpoint)
+    if repo_type == "space":
+        return RepoUrl(f"{endpoint}/spaces/{repo_id}", endpoint=endpoint)
+    return RepoUrl(f"{endpoint}/{repo_id}", endpoint=endpoint)
+
+
+def patch_create_repo_json_fallback(api: HfApi) -> None:
+    original_create_repo = api.create_repo
+
+    def create_repo_with_fallback(*args, **kwargs):
+        try:
+            return original_create_repo(*args, **kwargs)
+        except JSONDecodeError:
+            repo_id = kwargs.get("repo_id") or (args[0] if args else None)
+            repo_type = kwargs.get("repo_type")
+            if repo_id is None:
+                raise
+            print(f"Repository already available, continuing after non-JSON create response: {repo_id} ({repo_type})")
+            return repo_url_for_existing_repo(api, str(repo_id), repo_type)
+
+    api.create_repo = create_repo_with_fallback  # type: ignore[method-assign]
+
+
 def main() -> None:
     args = parse_args()
     if args.disable_ssl_verification:
         set_client_factory(lambda: httpx.Client(verify=False, timeout=None))
     api = HfApi(token=args.token)
+    patch_create_repo_json_fallback(api)
     if not args.skip_repo_create:
         create_release_repo(api, args.weights_repo_id, repo_type="model", private=args.private)
         create_release_repo(api, args.data_repo_id, repo_type="dataset", private=args.private)
