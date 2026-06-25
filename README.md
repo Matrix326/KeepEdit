@@ -65,26 +65,26 @@ external/EditAR/
 
 KeepEdit 发布资源：
 
-```text
-代码仓库:      https://github.com/Yitaallen/KeepEdit
-发布权重:      https://huggingface.co/Yitaallen/keepedit-release-weights
-发布数据:      https://huggingface.co/datasets/Yitaallen/keepedit-release-data
-```
+| 资源 | 地址 | 说明 |
+| --- | --- | --- |
+| 代码仓库 | [Yitaallen/KeepEdit](https://github.com/Yitaallen/KeepEdit) | 代码、脚本、文档、报告和小型可视化结果 |
+| 发布权重 | [Yitaallen/keepedit-release-weights](https://huggingface.co/Yitaallen/keepedit-release-weights) | GT-LoRA、MTP LoRA、MoE Teacher LoRA 的 LoRA 权重 |
+| 发布数据 | [Yitaallen/keepedit-release-data](https://huggingface.co/datasets/Yitaallen/keepedit-release-data) | 预处理数据、专家候选、MoE teacher、模型输出和完整可视化 gallery |
 
 上游数据、模型与外部项目：
 
-```text
-MagicBrush 数据集:              https://huggingface.co/datasets/osunlp/MagicBrush
-Qwen-Image-Edit-2511:           https://huggingface.co/Qwen/Qwen-Image-Edit-2511
-Qwen-Image:                     https://huggingface.co/Qwen/Qwen-Image
-Qwen-Image-Edit:                https://huggingface.co/Qwen/Qwen-Image-Edit
-InstructPix2Pix:                https://huggingface.co/timbrooks/instruct-pix2pix
-Qwen3-VL-8B-Instruct:           https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct
-EditAR release checkpoint:      https://huggingface.co/datasets/JitengMu/CVPR2025_EditAR_release
-LlamaGen T2I / VQ tokenizer:    https://huggingface.co/peizesun/llamagen_t2i
-flan-t5-xl:                     https://huggingface.co/google/flan-t5-xl
-DiffSynth-Studio:               https://github.com/modelscope/DiffSynth-Studio
-```
+| 资源 | 地址 |
+| --- | --- |
+| MagicBrush 数据集 | [osunlp/MagicBrush](https://huggingface.co/datasets/osunlp/MagicBrush) |
+| Qwen-Image-Edit-2511 | [Qwen/Qwen-Image-Edit-2511](https://huggingface.co/Qwen/Qwen-Image-Edit-2511) |
+| Qwen-Image | [Qwen/Qwen-Image](https://huggingface.co/Qwen/Qwen-Image) |
+| Qwen-Image-Edit | [Qwen/Qwen-Image-Edit](https://huggingface.co/Qwen/Qwen-Image-Edit) |
+| InstructPix2Pix | [timbrooks/instruct-pix2pix](https://huggingface.co/timbrooks/instruct-pix2pix) |
+| Qwen3-VL-8B-Instruct | [Qwen/Qwen3-VL-8B-Instruct](https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct) |
+| EditAR release checkpoint | [JitengMu/CVPR2025_EditAR_release](https://huggingface.co/datasets/JitengMu/CVPR2025_EditAR_release) |
+| LlamaGen T2I / VQ tokenizer | [peizesun/llamagen_t2i](https://huggingface.co/peizesun/llamagen_t2i) |
+| flan-t5-xl | [google/flan-t5-xl](https://huggingface.co/google/flan-t5-xl) |
+| DiffSynth-Studio | [modelscope/DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio) |
 
 ### 3.1 下载 KeepEdit 发布权重
 
@@ -360,7 +360,19 @@ bash scripts/evaluate_qwen_edit_experiment.sh
 reports/keepedit_release_full_metrics_comparison.csv
 ```
 
-## 10. 当前发布版指标
+## 10. 查看可视化结果
+
+完整可视化 gallery 已发布在 Hugging Face 数据仓库中；如果已经下载发布数据，也可以在本地直接打开对应 `index.html`。GitHub 上推荐点击 Hugging Face 入口查看完整文件夹。
+
+| 内容 | 本地入口 | Hugging Face 入口 |
+| --- | --- | --- |
+| MoE-Fusion Teacher 可视化 | [reports/visual_gallery_magicbrush_dev_moe_fusion/index.html](reports/visual_gallery_magicbrush_dev_moe_fusion/index.html) | [HF: visual_gallery_magicbrush_dev_moe_fusion](https://huggingface.co/datasets/Yitaallen/keepedit-release-data/tree/main/reports/visual_gallery_magicbrush_dev_moe_fusion) |
+| MTP LoRA 可视化 | [reports/visual_gallery_magicbrush_dev_qwen2511_mtp_phasea/index.html](reports/visual_gallery_magicbrush_dev_qwen2511_mtp_phasea/index.html) | [HF: visual_gallery_magicbrush_dev_qwen2511_mtp_phasea](https://huggingface.co/datasets/Yitaallen/keepedit-release-data/tree/main/reports/visual_gallery_magicbrush_dev_qwen2511_mtp_phasea) |
+| MoE Teacher LoRA 可视化 | [reports/visual_gallery_magicbrush_dev_qwen2511_moe_teacher_onestage/index.html](reports/visual_gallery_magicbrush_dev_qwen2511_moe_teacher_onestage/index.html) | [HF: visual_gallery_magicbrush_dev_qwen2511_moe_teacher_onestage](https://huggingface.co/datasets/Yitaallen/keepedit-release-data/tree/main/reports/visual_gallery_magicbrush_dev_qwen2511_moe_teacher_onestage) |
+
+可视化页面按样本展示输入图、目标图、prompt 和模型输出，适合快速检查模型是否真正执行了编辑、背景是否被破坏、以及不同方法之间的失败模式。
+
+## 11. 当前发布版指标
 
 ```text
 Qwen2511 Base:
@@ -382,7 +394,7 @@ MoE Teacher LoRA:
 
 MoE Teacher LoRA 是当前客观指标最好的可部署模型；MTP LoRA 是更简洁、不依赖专家候选的强改进版本。
 
-## 11. 上传到 Hugging Face
+## 12. 上传到 Hugging Face
 
 ```bash
 bash scripts/pack_release_data_archives.sh

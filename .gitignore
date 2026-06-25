@@ -13,10 +13,5 @@ __pycache__/
 /checkpoints/
 /external/
 hf_release/staging/
-/reports/*.png
-/reports/*.csv
-/reports/*.json
-/reports/*.jsonl
-/reports/logs/
-/reports/visual_gallery*/
+/reports/visual_gallery*/assets/
 *.egg-info/
