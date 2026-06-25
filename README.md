@@ -67,7 +67,6 @@ KeepEdit 发布资源：
 
 | 资源 | 地址 | 说明 |
 | --- | --- | --- |
-| 代码仓库 | [Yitaallen/KeepEdit](https://github.com/Yitaallen/KeepEdit) | 代码、脚本、文档、报告和小型可视化结果 |
 | 发布权重 | [Yitaallen/keepedit-release-weights](https://huggingface.co/Yitaallen/keepedit-release-weights) | GT-LoRA、MTP LoRA、MoE Teacher LoRA 的 LoRA 权重 |
 | 发布数据 | [Yitaallen/keepedit-release-data](https://huggingface.co/datasets/Yitaallen/keepedit-release-data) | 预处理数据、专家候选、MoE teacher、模型输出和完整可视化 gallery |
 
