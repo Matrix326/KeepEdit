@@ -1,0 +1,6 @@
+[pack] data/processed -> /data/shiliangzhi/work-space/wyt/our_project/hf_release/staging/hf_dataset/archives/data_processed.tar
+[pack] data/diffsynth -> /data/shiliangzhi/work-space/wyt/our_project/hf_release/staging/hf_dataset/archives/data_diffsynth.tar
+[pack] data/outputs -> /data/shiliangzhi/work-space/wyt/our_project/hf_release/staging/hf_dataset/archives/data_outputs.tar
+[pack] data/candidates -> /data/shiliangzhi/work-space/wyt/our_project/hf_release/staging/hf_dataset/archives/data_candidates.tar
+[pack] data/teachers -> /data/shiliangzhi/work-space/wyt/our_project/hf_release/staging/hf_dataset/archives/data_teachers.tar
+[done] archives written to /data/shiliangzhi/work-space/wyt/our_project/hf_release/staging/hf_dataset/archives

@@ -1,0 +1,15 @@
+{
+  "rows": 528,
+  "mean_bg_ssim": 0.8275252064451565,
+  "median_bg_ssim": 0.8534068548843784,
+  "mean_edit_region_change": 0.17234552158554312,
+  "median_edit_region_change": 0.16770486533641815,
+  "mean_input_output_psnr": 19.38020957095829,
+  "median_input_output_psnr": 19.26777394839554,
+  "mean_input_output_ssim": 0.7613454891763853,
+  "median_input_output_ssim": 0.7922721803188324,
+  "mean_target_output_psnr": 18.45608773232041,
+  "median_target_output_psnr": 18.240208822828908,
+  "mean_target_output_ssim": 0.739945044599925,
+  "median_target_output_ssim": 0.7687035501003265
+}

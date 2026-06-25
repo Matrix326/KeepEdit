@@ -1,0 +1,20 @@
+2026-06-25_14:30:04 upload visual galleries start
+2026-06-25_14:30:04 uploading reports/visual_gallery_magicbrush_dev_moe_fusion
+It seems you are trying to upload a large folder at once. This might take some time and then fail if the folder is too large. For such cases, it is recommended to upload in smaller batches or to use `HfApi().upload_large_folder(...)`/`hf upload-large-folder` instead. For more details, check out https://huggingface.co/docs/huggingface_hub/main/en/guides/upload#upload-a-large-folder.
+Start hashing 385 files.
+Finished hashing 385 files.
+url=https://huggingface.co/datasets/Yitaallen/keepedit-release-data/commit/e14ca4099e47f3408d63ebb3b3772b5c07f447c1
+2026-06-25_14:32:14 done reports/visual_gallery_magicbrush_dev_moe_fusion
+2026-06-25_14:32:14 uploading reports/visual_gallery_magicbrush_dev_qwen2511_moe_teacher_onestage
+It seems you are trying to upload a large folder at once. This might take some time and then fail if the folder is too large. For such cases, it is recommended to upload in smaller batches or to use `HfApi().upload_large_folder(...)`/`hf upload-large-folder` instead. For more details, check out https://huggingface.co/docs/huggingface_hub/main/en/guides/upload#upload-a-large-folder.
+Start hashing 385 files.
+Finished hashing 385 files.
+url=https://huggingface.co/datasets/Yitaallen/keepedit-release-data/commit/1a94c9d822ad94e2ef7797a4fe1c1bce2e1be643
+2026-06-25_14:34:22 done reports/visual_gallery_magicbrush_dev_qwen2511_moe_teacher_onestage
+2026-06-25_14:34:22 uploading reports/visual_gallery_magicbrush_dev_qwen2511_mtp_phasea
+It seems you are trying to upload a large folder at once. This might take some time and then fail if the folder is too large. For such cases, it is recommended to upload in smaller batches or to use `HfApi().upload_large_folder(...)`/`hf upload-large-folder` instead. For more details, check out https://huggingface.co/docs/huggingface_hub/main/en/guides/upload#upload-a-large-folder.
+Start hashing 385 files.
+Finished hashing 385 files.
+url=https://huggingface.co/datasets/Yitaallen/keepedit-release-data/commit/d37adbadc1eb2384ba714abe21c5d6ec7fcf2733
+2026-06-25_14:35:37 done reports/visual_gallery_magicbrush_dev_qwen2511_mtp_phasea
+2026-06-25_14:35:37 upload visual galleries complete

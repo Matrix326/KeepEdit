@@ -1,0 +1,47 @@
+[
+  {
+    "name": "GT LoRA",
+    "path": "reports/logs/keepedit_three_lora_20260624_112909/gt_lora/gt_lora.loss.tsv",
+    "points": 880,
+    "first_step": 10,
+    "last_step": 8800,
+    "first_loss": 0.028147,
+    "last_loss": 0.029331,
+    "min_loss": 0.0,
+    "max_loss": 0.125597,
+    "mean_loss": 0.021213713636363637,
+    "first_window_mean": 0.025600900000000003,
+    "last_window_mean": 0.0184687,
+    "smooth_last": 0.01519956000000004
+  },
+  {
+    "name": "MTP LoRA",
+    "path": "reports/logs/keepedit_three_lora_20260624_112909/mtp_lora/mtp_lora.loss.tsv",
+    "points": 907,
+    "first_step": 10,
+    "last_step": 9070,
+    "first_loss": 0.072244,
+    "last_loss": 0.186969,
+    "min_loss": 0.0,
+    "max_loss": 0.3629,
+    "mean_loss": 0.10848604961411246,
+    "first_window_mean": 0.11481656000000001,
+    "last_window_mean": 0.10904087999999999,
+    "smooth_last": 0.10646400000000003
+  },
+  {
+    "name": "MoE LoRA",
+    "path": "reports/logs/keepedit_three_lora_20260624_112909/moe_lora/moe_lora.loss.tsv",
+    "points": 880,
+    "first_step": 10,
+    "last_step": 8800,
+    "first_loss": 0.051353,
+    "last_loss": 0.096882,
+    "min_loss": 0.0,
+    "max_loss": 0.338903,
+    "mean_loss": 0.06856828636363636,
+    "first_window_mean": 0.04772903999999999,
+    "last_window_mean": 0.0785471,
+    "smooth_last": 0.08680219999999989
+  }
+]

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>KeepEdit Loss Curves</title>
+<style>
+body{font-family:Arial,"Microsoft YaHei",sans-serif;margin:24px;background:#f8fafc;color:#0f172a}
+img{max-width:100%;border:1px solid #d8dee9;background:white;margin:12px 0}
+table{border-collapse:collapse;background:white;margin-top:16px}
+th,td{border:1px solid #d8dee9;padding:8px 10px;text-align:right}
+th:first-child,td:first-child{text-align:left}
+th{background:#eef2f7}
+code{background:#eef2f7;padding:2px 4px;border-radius:4px}
+</style></head>
+<body>
+<h1>KeepEdit 三个 LoRA 实验 Loss 曲线</h1>
+<p>包含 GT LoRA、MTP LoRA、MoE LoRA。平滑曲线使用 25 条 loss 记录滑动平均；当前日志每 10 step 记录一次。</p>
+<img src="three_lora_loss_curves.png" alt="raw and smoothed loss curves">
+<img src="three_lora_loss_trend.png" alt="smoothed loss trend">
+<h2>统计摘要</h2>
+<table>
+<tr><th>实验</th><th>点数</th><th>起始 step</th><th>结束 step</th><th>前窗均值</th><th>后窗均值</th><th>最小 loss</th><th>最大 loss</th><th>末端 MA25</th></tr>
+<tr><td>GT LoRA</td><td>880</td><td>10</td><td>8800</td><td>0.025601</td><td>0.018469</td><td>0.000000</td><td>0.125597</td><td>0.015200</td></tr>
+<tr><td>MTP LoRA</td><td>907</td><td>10</td><td>9070</td><td>0.114817</td><td>0.109041</td><td>0.000000</td><td>0.362900</td><td>0.106464</td></tr>
+<tr><td>MoE LoRA</td><td>880</td><td>10</td><td>8800</td><td>0.047729</td><td>0.078547</td><td>0.000000</td><td>0.338903</td><td>0.086802</td></tr>
+</table>
+<p>数据文件：<code>three_lora_loss_curves.csv</code>，摘要：<code>three_lora_loss_summary.json</code></p>
+</body></html>
